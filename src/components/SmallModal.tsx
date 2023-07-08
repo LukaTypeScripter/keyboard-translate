@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SmallModals } from './interfaces/interface';
 
-function SmallModal({ showSmallModal,isChecked }: SmallModals) {
-  const [activeItem, setActiveItem] = useState('Sans Serif');
+function SmallModal({ showSmallModal,isChecked,setActiveItem,activeItem }: SmallModals) {
+ 
 
   const handleItemClick = (item: string) => {
     setActiveItem(item);

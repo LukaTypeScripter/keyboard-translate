@@ -4,11 +4,15 @@ export interface HeaderProps {
     isChecked: boolean;
     toggleChecked: () => void
     setWord:React.Dispatch<React.SetStateAction<string>>
+    activeItem:string
+    setActiveItem:React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface SmallModals {
     showSmallModal: boolean
     isChecked: boolean
+    activeItem:string
+    setActiveItem:React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface SearchProps {
@@ -56,5 +60,6 @@ export interface Word {
     url: string;
   }
   export interface MainProps {
-    wordData:Word
+    wordData:Word[]
   }
+

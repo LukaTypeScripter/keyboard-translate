@@ -22,6 +22,11 @@ module.exports = {
       boxShadow: {
         
       },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Lora', 'serif'],
+        mono: ['Inconsolata', 'monospace']
+      },
       screens: {
         xs: "450px",
       },
