@@ -4,7 +4,7 @@ import { HeaderProps } from "./interfaces/interface";
 import SmallModal from "./SmallModal";
 import Search from "./Search";
 function Header(p:HeaderProps) {
-    const {toggleChecked,isChecked} = p; 
+    const {toggleChecked,isChecked,setWord} = p; 
     const [showSmallModal,setShowSmallModal] = useState(false)
   return (
     <header className="ps-5 pe-5 max-w-4xl pt-6 ms-auto me-auto">
@@ -46,7 +46,7 @@ function Header(p:HeaderProps) {
           
       </div>
       {/**search*/}
-      <Search isChecked={isChecked}/>
+      <Search isChecked={isChecked} setWord={setWord}/>
     </header>
   );
 }
