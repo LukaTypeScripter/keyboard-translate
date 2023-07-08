@@ -6,9 +6,10 @@ import { Word } from './components/interfaces/interface';
 //
 function App() {
   const [isChecked, setIsChecked] = useState(false)
-  const [word,setWord] = useState('')
+  const [word,setWord] = useState('keyboard')
   const [wordData,setWordData] = useState<Word[]>([])
   const [loading,setloading] = useState(false)
+  const [activeItem, setActiveItem] = useState('Sans Serif');
   const toggleChecked = () => {
     setIsChecked(!isChecked)
   }
@@ -16,22 +17,32 @@ function App() {
   let color = isChecked ? 'dark:text-white' : '';
   
 
-useEffect(() => {
-  setloading(true)
-  axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/bad`)
-  .then(response => {
-    setWordData(response.data)
-    setloading(false)
-  })
-  .catch(error => {
-    console.error(error);
-  });
-},[])
+  useEffect(() => {
+    setloading(true);
+    if (word !== '') {
+      axios
+        .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+        .then((response) => {
+          setWordData(response.data);
+          setloading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setloading(false);
+        });
+    } else {
+      setWordData([]);
+      setloading(false);
+    }
+  }, [word]);
+const fontSans = activeItem === "Sans Serif" && 'font-sans' 
+const fontSerif = activeItem === "Serif" && "font-serif"
+const fontMono = activeItem === "Mono" && "font-mono"
 console.log(wordData)
   return (
-    <div className={`relative z-0 ${dark} ${color} `}>
-      <Header toggleChecked={toggleChecked} isChecked={isChecked} setWord={setWord}/>
-      {wordData.length > 0 && <Main wordData={wordData[0]} />}
+    <div className={`relative z-0 ${dark} ${color} ${fontSans} ${fontSerif} ${fontMono}`} >
+      <Header toggleChecked={toggleChecked} isChecked={isChecked} setWord={setWord} activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Main wordData={wordData} />
       {loading && (<>weeee</>)}
 
     </div>
