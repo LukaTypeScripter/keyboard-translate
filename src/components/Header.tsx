@@ -4,7 +4,7 @@ import { HeaderProps } from "./interfaces/interface";
 import SmallModal from "./SmallModal";
 import Search from "./Search";
 function Header(p:HeaderProps) {
-    const {toggleChecked,isChecked,setWord} = p; 
+    const {toggleChecked,isChecked,setWord,setActiveItem,activeItem} = p; 
     const [showSmallModal,setShowSmallModal] = useState(false)
   return (
     <header className="ps-5 pe-5 max-w-4xl pt-6 ms-auto me-auto">
@@ -24,7 +24,7 @@ function Header(p:HeaderProps) {
           </div>
           {/**TODO:PopUp Modal */}
           {showSmallModal && (
-            <SmallModal showSmallModal={showSmallModal} isChecked={isChecked} />
+            <SmallModal showSmallModal={showSmallModal} isChecked={isChecked} setActiveItem={setActiveItem} activeItem={activeItem}/>
           )}
         
         </div>
