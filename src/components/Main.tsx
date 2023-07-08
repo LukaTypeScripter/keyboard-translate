@@ -1,148 +1,128 @@
-import React, { Fragment, useRef } from 'react'
-import { newWindow } from '../assets'
-import { MainProps } from './interfaces/interface'
-//https://api.dictionaryapi.dev/media/pronunciations/en/bad-uk.mp3
-function Main({wordData}:MainProps) {
-    const heading = 'no-underline  font-bold text-2xl leading-5'
-    const { word, phonetic, meanings, sourceUrls, } = wordData;
-    const verbMeanings = meanings.filter((meaning) => meaning.partOfSpeech.toLowerCase() === 'verb');
+import React, { Fragment, useEffect, useRef } from 'react';
+import { newWindow } from '../assets';
+import { MainProps } from './interfaces/interface';
+
+function Main({ wordData }: MainProps) {
+  const heading = 'no-underline font-bold text-2xl leading-5';
+{/**TODO:fix the error about sounds */}
+  // Create a reference to the audio element
 
   // Create a reference to the audio element
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRefs = useRef<Array<HTMLAudioElement | null>>([]);
 
   // Function to play the audio
-  const playAudio = () => {
-    audioRef.current?.play();
+  const playAudio = (index: number) => {
+    audioRefs.current[index]?.play();
+    console.log(index)
   };
 
-    return (
-    <main
-    className='ps-5 pe-5 max-w-4xl pt-6 ms-auto me-auto w-full'
-    >
-        <section>
-       <section className='flex justify-between items-center'>
-        <div className='flex-col'>
-        <h1 className={`${heading}`}>{word}</h1>
-        <p className='text-purple'>{phonetic}</p>
-        </div>
-        <figure className='col-span-2/3 row-span-full'>
-          <audio ref={audioRef} controls className='hidden'>
-            <source src={wordData.phonetics[0].audio || wordData.phonetics[1].audio} type='audio/mpeg' />
-          </audio>
-          <button onClick={playAudio}>
-            <svg xmlns='http://www.w3.org/2000/svg' width='75' height='75' viewBox='0 0 75 75'>
-              <g fill='#A445ED' fill-rule='evenodd'>
-                <circle cx='37.5' cy='37.5' r='37.5' opacity='.25' />
-                <path d='M29 27v21l21-10.5z' />
-              </g>
-            </svg>
-          </button>
-          <a href={wordData.phonetics[0].sourceUrl} target='_blank' rel='noopener noreferrer' className='hidden'>
-            Listen on Wikimedia Commons
-          </a>
-        </figure>
-       </section>
-      {/**TODO:add errors */}
-        <section >
-            <div className='flex flex-row gap-8 mt-8 items-center'>
-                <h2 className={`${heading}`}>noun</h2>
-                <span className='w-full h-[1px] items-center bg-[#3b3b3b]'></span>
-            </div>
-        </section>
-        <section>
-        <section>
-        <h3 className='mt-8 text-xl'>Meaning</h3>
-        {wordData.meanings.map((meaning, index) => (
-          <div key={index} className='mt-4 pl-4 '>
-            <h4 className='font-bold'>{meaning.partOfSpeech}</h4>
-            <ul>
-              {meaning.definitions.map((definition, i) => (
-                <li key={i} >{definition.definition}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+  // Create a set to store unique words
+  const uniqueWords = new Set();
 
-      {meanings.map((meaning, index) => (
+  // Filter out duplicate words
+  const filteredData = wordData.filter((data) => {
+    if (uniqueWords.has(data.word)) {
+      return false;
+    } else {
+      uniqueWords.add(data.word);
+      return true;
+    }
+  });
+
+  // Reset audioRefs when performing a new search
+  useEffect(() => {
+    audioRefs.current = [];
+  }, [wordData]);
+  return (
+    <main className='ps-5 pe-5 max-w-4xl pt-6 ms-auto me-auto'>
+      {filteredData.map((data, index) => (
         <Fragment key={index}>
-          {meaning.synonyms && meaning.synonyms.length > 0 && (
-            <div className='inline  '>
-              <h2 className='text-bold text-xl inline-block mr-8 pt-8'>Synonyms</h2>
-              <ul className='inline text-purple pl-0 pt-4 '>
-                {meaning.synonyms.map((synonym, i) => (
-                  <li className='inline' key={i} >{synonym},</li>
+          <section className='flex justify-between items-center'>
+            <div className='flex-col'>
+              <h1 className={`text-5xl font-bold` }>{data.word}</h1>
+              <p className='text-purple'>{data.phonetic}</p>
+            </div>
+            <figure className='col-span-2/3 row-span-full'>
+              {data.phonetics.length > 0 && (
+                <Fragment>
+                  <audio ref={(ref) => (audioRefs.current[index] = ref)} controls>
+                    {data.phonetics.map((phonetic, phoneticIndex) => (
+                      <source key={phoneticIndex} src={phonetic.audio} type='audio/mpeg' />
+                    ))}
+                  </audio>
+                  <button onClick={() => playAudio(index)}>
+                    <svg xmlns='http://www.w3.org/2000/svg' width='75' height='75' viewBox='0 0 75 75'>
+                      <g fill='#A445ED' fill-rule='evenodd'>
+                        <circle cx='37.5' cy='37.5' r='37.5' opacity='.25' />
+                        <path d='M29 27v21l21-10.5z' />
+                      </g>
+                    </svg>
+                  </button>
+                </Fragment>
+              )}
+            </figure>
+          </section>
+          {data.meanings.map((meaning, index) => (
+            <section key={index}>
+              <div className='flex flex-row gap-8 mt-8 items-center'>
+                <h2 className={`${heading}`}>{meaning.partOfSpeech}</h2>
+                <span className='w-full h-[1px] items-center bg-[#3b3b3b]'></span>
+              </div>
+              <h3 className='mt-8 text-xl'>Meaning</h3>
+              <ul className='list-none list-custom-purple mt-4 pl-4'>
+  {meaning.definitions.map((definition, index) => (
+    <li
+      key={index}
+      className='relative pl-6 py-1'
+    >
+      <span className='before:absolute before:inset-0 before:w-2 before:h-2 before:bg-purple before:rounded-full before:left-0 before:top-[9px]'></span>
+      {definition.definition}
+    </li>
+  ))}
+</ul>
+              <div>
+                {meaning.synonyms.length > 0 && (
+                  <div>
+                    <h4 className='mt-6 pt-6 border-t border-[#3b3b3b] text-gray-500 text-lg'>Synonyms</h4>
+                    <ul className='flex flex-wrap list-none mt-2 pl-0 text-purple gap-3'>
+                      {meaning.synonyms.map((synonym, index) => (
+                        <li key={index} className='inline'>{synonym},</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {meaning.antonyms.length > 0 && (
+                  <div>
+                    <h4 className='mt-6 pt-6 border-t border-[#3b3b3b] text-gray-500 text-lg '>Antonyms</h4>
+                    <ul className='flex flex-wrap list-none mt-2 pl-0 text-purple gap-3'>
+                      {meaning.antonyms.map((antonym, index) => (
+                        <li key={index} className='inline'>{antonym},</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </section>
+          ))}
+          {data.sourceUrls.length > 0 && (
+            <section>
+              <h4 className='mt-6 pt-6 border-t border-[#3b3b3b]'>Source</h4>
+              <ul className='list-none mt-2 pl-0'>
+                {data.sourceUrls.map((url, index) => (
+                  <li key={index}>
+                    <a className='flex gap-3 items-center' target='_blank' href={url}>
+                      <span>{url}</span>
+                      <img src={newWindow} alt='win' className='h-[14px] w-[14px]' />
+                    </a>
+                  </li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {meaning.antonyms && meaning.antonyms.length > 0 && (
-              <div className='inline  '>
-              <h2 className='text-bold text-xl inline-block mr-8 pt-8'>Synonyms</h2>
-              <ul className='inline text-purple pl-0 pt-4 '>
-                {meaning.antonyms.map((ant, i) => (
-                  <li className='inline' key={i} >{ant},</li>
-                ))}
-              </ul>
-            </div>
+            </section>
           )}
         </Fragment>
       ))}
-        <h4 className='mt-6 pt-6 border-t border-[#3b3b3b]'>source</h4>
-        <ul className='list-none mt-2 pl-0'><li><a className='flex gap-3 items-center' target='_blank' href={wordData.sourceUrls[0]}>
-                <span>{wordData.sourceUrls[0]}</span>
-                <img src={newWindow} alt="win" className='h-[14px] w-[14px]' />
-            </a></li></ul>
-        </section>
-        <section >
-            <div className='flex flex-row gap-8 mt-8 items-center'>
-                <h2 className={`${heading}`}>Verb</h2>
-                <span className='w-full h-[1px] items-center bg-[#3b3b3b]'></span>
-            </div>
-        </section>
-        <section>
-        <h3 className='mt-8'>Meaning</h3>
-        <ul className='pl-4 mt-4'>
-          {verbMeanings.map((meaning, index) => (
-            <li key={index}>
-              <h4 className='font-bold'>{meaning.partOfSpeech}</h4>
-              <ul>
-                {meaning.definitions.map((definition, i) => (
-                  <li key={i}>{definition.definition}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </section>
-        <h4 className='mt-6 pt-6 border-t border-[#3b3b3b]'>source</h4>
-        <ul className='list-none mt-2 pl-0'><li><a className='flex gap-3 items-center' target='_blank' href={wordData.sourceUrls[0]}>
-                <span>{wordData.sourceUrls[0]}</span>
-                <img src={newWindow} alt="win" className='h-[14px] w-[14px]' />
-            </a></li></ul>
-            <section >
-            <div className='flex flex-row gap-8 mt-8 items-center'>
-                <h2 className={`${heading}`}>noun</h2>
-                <span className='w-full h-[1px] items-center bg-[#3b3b3b]'></span>
-                
-            </div>
-        </section>
-        <h3 className='mt-8'>Meaning</h3>
-            <ul className='pl-4 mt-4'>
-                <li>
-                    <p className='font-normal no-underline  text-sm leading-6'>wedawd</p>
-                    <p className='font-normal no-underline  text-sm leading-6 mt-2 text-[#757575]'>awdawd</p>
-                </li>
-                </ul>
-        <h4 className='mt-6 pt-6 border-t border-[#3b3b3b]'>source</h4>
-        <ul className='list-none mt-2 pl-0'><li><a className='flex gap-3 items-center' target='_blank'>
-                <span>{wordData.sourceUrls[0]}</span>
-                <img src={newWindow} alt="win" className='h-[14px] w-[14px]' />
-            </a></li></ul>
-            </section>
     </main>
-  )
+  );
 }
 
-export default Main
+export default Main;
