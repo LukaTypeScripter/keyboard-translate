@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useEffect, useRef } from "react";
 import { SmallModals } from "./interfaces/interface";
 
 function SmallModal({
-  showSmallModal,
+  
   setShowSmallModal,
   isChecked,
   setActiveItem,
