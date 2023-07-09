@@ -9,6 +9,7 @@ function Search({isChecked,setWord}:SearchProps) {
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setWord(searchTerm);
+    
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
