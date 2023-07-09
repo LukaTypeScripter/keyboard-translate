@@ -13,6 +13,7 @@ export interface SmallModals {
     isChecked: boolean
     activeItem:string
     setActiveItem:React.Dispatch<React.SetStateAction<string>>
+    setShowSmallModal:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface SearchProps {
